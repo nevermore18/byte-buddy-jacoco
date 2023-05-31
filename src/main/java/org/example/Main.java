@@ -10,23 +10,18 @@ import static net.bytebuddy.matcher.ElementMatchers.*;
 public class Main {
 
     public void call() {
-        try {
-//            System.setProperty("net.bytebuddy.dump", "./");
-            ByteBuddyAgent.install();
-            enhanceCucumberDefaultConfig();
-        } catch (Exception e) {
-            System.err.println(e);
-        }
+        ByteBuddyAgent.install();
+        config();
     }
 
-    private void enhanceCucumberDefaultConfig() throws ClassNotFoundException {
+    private void config() {
         Class<?> clz = User.class;
         new ByteBuddy()
                 .redefine(clz)
                 .method(named("get")
                         .and(isDeclaredBy(clz))
                         .and(returns(String.class)))
-                .intercept(MethodDelegation.to(MyIntercept.class))
+                .intercept(MethodDelegation.to(NewUser.class))
                 .make()
                 .load(getClass().getClassLoader(), ClassReloadingStrategy.fromInstalledAgent());
     }
